@@ -95,21 +95,8 @@ def one_hot_label(vector, Softmax_m=Softmax_m):
 
 def one_hot_label_new(vector, Softmax_m=Softmax_m):
     x = Softmax_m(vector)
-    # print("the prob is: ", x.size())
-    # the prob is:  torch.Size([64, 3])
     indices = torch.argmax(x, dim=1)
-    # prob, _ = torch.max(x, dim=1)
     prob = 1 - x[:,0]
-    # # indices = torch.unsqueeze(indices, dim=1)
-    # # indices = torch.unsqueeze(indices, dim=0)
-    # print("the index is: ", indices.size())
-    # # the index is:  torch.Size([64])
-    # # prob = torch.index_select(x, 1, indices)
-    # # prob = x[:,indices]
-    # print(indices)
-    # print("===============")
-    # print(prob)
-    # import sys;sys.exit(0)
     indices = list(indices.cpu().numpy())
     prob = list(prob.cpu().numpy())
     return indices, prob
@@ -173,7 +160,6 @@ def setup_optimizer(args, SegNet, FENet):
     params_dict_list.append({'params' : FENet.module.transition1.parameters(), 'lr' : args.learning_rate})
     params_dict_list.append({'params' : FENet.module.conv_1x1_merge.parameters(), 'lr' : args.learning_rate})
     ## newly-added layer will have the larger learning rate.
-    ## newly-added layer will have the larger learning rate.
     ## 0.75 ==> 1
     params_dict_list.append({'params' : FENet.module.conv1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
     params_dict_list.append({'params' : FENet.module.bn1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
@@ -214,7 +200,6 @@ def restore_optimizer(optimizer, model_dir):
 def composite_obj(args, loss, loss_1, loss_2, loss_3, loss_4, loss_binary):
     ''' 'base', 'fg', 'local', 'full' '''
     if args.ablation == 'full':     # fine-grained + localization
-        # loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
         loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
     elif args.ablation == 'base':   # one-shot
         loss_total = loss_4
