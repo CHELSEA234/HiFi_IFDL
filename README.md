@@ -16,8 +16,17 @@ The quick view on the code structure:
 ./HiFi_IFDL
     ├── train.py
     ├── train.sh (call train.py to run the training)
+    ├── IMD_dataloader.py (call different dataloaders)
     ├── model (model module folder)
+    │      ├── NLCDetection_pconv.py (partial convolution, localization and classification modules)
+    │      ├── seg_hrnet.py (feature extrator based on HRNet)
+    │      ├── LaPlacianMs.py (laplacian filter on the feature map)
+    │      └── ...   
     ├── utils (utils, dataloader, and localization loss class.)
+    │      ├── custom_loss.py (localization loss class and the real pixel center initialization)
+    │      ├── utils 
+    │      ├── load_tdata.py (loading dataset/ will be improved :) )
+    │      └── ...   
     └── center (The pre-computed `.pth` file to represent the center used in the localization loss.)
 ```
 <p align="center">
