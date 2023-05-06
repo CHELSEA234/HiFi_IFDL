@@ -1,6 +1,8 @@
 # HiFi_IFDL
 
-This is the source code for image editing detection and localization, as well as the diffusion model attribution. Our work has been accepted by CVPR $2023$, titled as "*Hierarchical Fine-Grained Image Forgery Detection and Localization*". 
+This is the source code for image editing detection and localization, as well as the diffusion model attribution. Our work has been accepted by CVPR $2023$, titled as "*Hierarchical Fine-Grained Image Forgery Detection and Localization*". [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
+
+Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en), [Xiaohong Liu](https://jhc.sjtu.edu.cn/~xiaohongliu/), [Iacopo Masi](https://iacopomasi.github.io/), [Xiaoming Liu](http://cvlab.cse.msu.edu/)
 
 <p align="center">
   <img src="https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/overview_4.png" alt="drawing" width="1000"/>
