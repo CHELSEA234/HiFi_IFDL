@@ -200,9 +200,9 @@ class BranchCLS(nn.Module):
         return cls_res, cls_pro, feat
 
 class NLCDetection(nn.Module):
-    def __init__(self, args):
+    def __init__(self):
         super(NLCDetection, self).__init__()
-        self.crop_size = args.crop_size
+        self.crop_size = 256
         # self.device = torch.device('cuda:0,1,2')
         # self.split_tensor = torch.tensor([1, 3]).to(self.device)
         self.split_tensor_1 = torch.tensor([1, 3]).cuda()

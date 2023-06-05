@@ -94,16 +94,15 @@ def one_hot_label(vector, Softmax_m=Softmax_m):
     return x
 
 def one_hot_label_new(vector, Softmax_m=Softmax_m):
+    '''
+        compute the probability for being as the synthesized image (TODO: double check).
+    '''
     x = Softmax_m(vector)
     indices = torch.argmax(x, dim=1)
     prob = 1 - x[:,0]
     indices = list(indices.cpu().numpy())
     prob = list(prob.cpu().numpy())
     return indices, prob
-
-def real_prob(vector, Softmax_m=Softmax_m):
-    x = Softmax_m(vector)
-    return x
 
 def level_1_convert(input_lst):
     res_lst = []
@@ -160,6 +159,7 @@ def setup_optimizer(args, SegNet, FENet):
     params_dict_list.append({'params' : FENet.module.transition1.parameters(), 'lr' : args.learning_rate})
     params_dict_list.append({'params' : FENet.module.conv_1x1_merge.parameters(), 'lr' : args.learning_rate})
     ## newly-added layer will have the larger learning rate.
+    ## newly-added layer will have the larger learning rate.
     ## 0.75 ==> 1
     params_dict_list.append({'params' : FENet.module.conv1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
     params_dict_list.append({'params' : FENet.module.bn1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
@@ -194,12 +194,14 @@ def restore_optimizer(optimizer, model_dir):
         print('Optimizer weight-loading succeeds.')
         optimizer.load_state_dict(state_dict['optimizer'])
     except:
-        print('{} Optimizer weight-loading fails.')
+        # print('{} Optimizer weight-loading fails.')
+        pass
     return optimizer
 
 def composite_obj(args, loss, loss_1, loss_2, loss_3, loss_4, loss_binary):
     ''' 'base', 'fg', 'local', 'full' '''
     if args.ablation == 'full':     # fine-grained + localization
+        # loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
         loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
     elif args.ablation == 'base':   # one-shot
         loss_total = loss_4

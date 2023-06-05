@@ -79,7 +79,8 @@ class TrainData(data.Dataset):
         
         splice_names     = self.img_retrieve('splice_randmask.txt', 'splice_randmask/fake',False)
         inpainting_names = self.img_retrieve('Inpainting.txt', 'Inpainting/fake', False)
-        copymove_names   = self.img_retrieve('Copy_move.txt', 'Copy_move/fake', False)
+        copymove_names   = self.img_retrieve('copy_move.txt', 'CopyMove', False)
+
         FaShifter_names  = self.img_retrieve('FaShifter.txt', 'FaShifter', False)
         STGAN_names   = self.img_retrieve('STGAN.txt', 'STGAN/fake', False)
         Star2_names   = self.img_retrieve('Star2.txt', 'Star2', False)
@@ -99,6 +100,7 @@ class TrainData(data.Dataset):
         with open(join(self.file_path_fake, 'DDPM_church.txt')) as f:
             content = f.readlines()
             for content in content[:31500]:
+            # for content in content[:int(self.val_num/2)]:
                 content = content.strip()
                 img_name = join(self.file_path_fake, 'DDPM_church', content)
                 DDPM_names.append(img_name)
@@ -106,6 +108,7 @@ class TrainData(data.Dataset):
         with open(join(self.file_path_fake, 'DDPM_bedroom.txt')) as f:
             content = f.readlines()
             for content in content[:27000]:
+            # for content in content[:int(self.val_num/2)]:
                 content = content.strip()
                 img_name = join(self.file_path_fake, 'DDPM_bedroom', content)
                 DDPM_names.append(img_name)
@@ -205,10 +208,9 @@ class TrainData(data.Dataset):
 
         crop_height, crop_width = self.crop_size
         ma_height, ma_width = mask.shape[:2]
+        mask = mask.astype(np.float32)
         if ma_height != crop_height or ma_height != crop_width:
             mask = self._resize_func(mask)
-            if mask.max() == 255:
-                mask = mask.astype(np.float32) / 255.
 
         mask = mask.astype(np.float32)
         mask[mask > 0.5] = 1
@@ -216,26 +218,13 @@ class TrainData(data.Dataset):
         mask = torch.from_numpy(mask)
         return mask
 
-    def load_image(self, image_name, aug_index=None):
+    def get_image(self, image_name, aug_index):
         '''transform the image.'''
         image = imageio.imread(image_name)
-        im_height, im_width, im_channel = image.shape
-        crop_height, crop_width = self.crop_size
-
-        if im_channel != 3:
-            print(image_name)
-            raise Exception('Image channel is not 3.')
-
-        if im_height != crop_height or im_width != crop_width:
-            image = self._resize_func(image)
-
+        image = self._resize_func(image)
         image = image.astype(np.float32) / 255.
         image = torch.from_numpy(image)
         return image.permute(2, 0, 1)
-
-    def get_image(self, image_name, aug_index):
-        image = self.load_image(image_name, aug_index=aug_index)
-        return image
 
     def get_mask(self, image_name, cls, aug_index):
         '''given the cls, we return the mask.'''
@@ -253,9 +242,16 @@ class TrainData(data.Dataset):
             mask = self.load_mask(mask_name, aug_index=aug_index)
             return_res = [1,1,1,cls - 4]
         
-        # inpainting and copy-move
-        elif cls in [6,7]:
+        # inpainting
+        elif cls == 6:
             mask_name = image_name.replace('fake', 'mask').replace('.jpg', '.png')
+            mask = self.load_mask(mask_name, aug_index=aug_index)
+            return_res = [1,1,1,cls - 4]
+
+        # copy-move
+        elif cls == 7:
+            mask_name = image_name.replace('.png', '_mask.png')
+            mask_name = mask_name.replace('CopyMove', 'CopyMove_mask')
             mask = self.load_mask(mask_name, aug_index=aug_index)
             return_res = [1,1,1,cls - 4]
 
@@ -323,7 +319,7 @@ class TrainData(data.Dataset):
             return_cls = 5
         elif '/Inpainting/' in image_name:
             return_cls = 6
-        elif '/Inpainting_overfit/' in image_name:
+        elif '/CopyMove/' in image_name:
             return_cls = 7
         elif '/FaShifter/' in image_name:
             return_cls = 8
@@ -343,8 +339,9 @@ class TrainData(data.Dataset):
             return_cls = 15
         elif '/D_latent' in image_name:
             return_cls = 16
-        elif '/GLIDE' in image_name:
+        elif '/GLIDE/' in image_name:
             return_cls = 17
         else:
+            print(image_name)
             raise ValueError 
         return return_cls

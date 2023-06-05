@@ -14,6 +14,7 @@ from sklearn import metrics
 from sklearn.metrics import roc_auc_score
 
 import os
+import csv
 import time
 import torch
 import torch.nn as nn
@@ -71,76 +72,79 @@ def save_weight(FENet, SegNet, FENet_dir, SegNet_dir, optimizer, epoch):
 						 'optimizer': optimizer.state_dict()}
 	torch.save(SegNet_checkpoint, '{0}/{1}.pth'.format(SegNet_dir, epoch + 1))
 
-def validation(
+def Inference(
 			args, FENet, SegNet, LOSS_MAP, tb_writer, 
-			iter_num=None, save_tag=False, localization=True
+			iter_num=None, save_tag=False, localization=True,
+			mask_save_path=f'/user/guoxia11/cvlshare/cvl-guoxia11/CVPR2023_github/mask_result/'
 			):
-	"""	standard validation. """
+	'''
+		the inference pipeline for the pre-trained model.
+		the image-level detection will dump to the csv file.
+		the pixel-level localization will be saved as in the npy file.
+	'''
 	val_data_loader = infer_dataset_loader_init(args, val_tag=0)
 	val_num_per_epoch = len(val_data_loader)
 	AUC_score_lst, F1_score_lst = [], []
 	mask_GT_lst, mask_pred_lst, mask_scr_lst = [], [], []
 	img_GT_list, img_pred_list, img_scr_list = [], [], []
 
+	## localization: forgery mask is saved in the npy file.
+	mask_save_path = mask_save_path
+	os.makedirs(mask_save_path, exist_ok=True)
+
+	## detection: different scores are saved in the csv file.
+	csv_file_name = f'result_{args.learning_rate}.csv'
+	csv_file = open(csv_file_name, mode='w')
+	csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+	csv_writer.writerow(['Image_names', 'Sc_4', 'RS_4', 'GT_4',
+										'Sc_3', 'RS_3', "GT_3",
+										'Sc_2', "RS_2", "GT_2",
+										'Sc_1', "RS_1", "GT_1"])
+
 	with torch.no_grad():
 		FENet.eval()
 		SegNet.eval()
 		for step, val_data in enumerate(tqdm(val_data_loader)):
-			## sampling for the validation.
-			if step % 250 != 0:
-				continue
-
 			image, masks, cls0, cls1, cls2, cls3, img_names = val_data
 			cls0, cls1, cls2, cls3 = cls0.to(device), cls1.to(device), cls2.to(device), cls3.to(device)
 			image, mask = image.to(device), masks[0].to(device)
 			mask, mask_balance = class_weight(mask, 1)
-			
 			output = FENet(image)
 			mask1_fea, mask1_binary, out0, out1, out2, out3 = SegNet(output, image)
 
 			## detection.
 			res3, prob3 = one_hot_label_new(out3)
-			res3 = level_1_convert(res3)
+			res2, prob2 = one_hot_label_new(out2)
+			res1, prob1 = one_hot_label_new(out1)
+			res0, prob0 = one_hot_label_new(out0)
+			
 			cls3_np = list(cls3.cpu().numpy())
-			cls3_np = level_1_convert(cls3_np)
-
-			img_GT_list.extend(cls3_np)
-			img_pred_list.extend(res3)
-			img_scr_list.extend(prob3)
-
+			cls2_np = list(cls2.cpu().numpy())
+			cls1_np = list(cls1.cpu().numpy())
+			cls0_np = list(cls0.cpu().numpy())
+			for i in range(len(cls3_np)):
+				write_list = [img_names[i], 
+								prob3[i], res3[i], cls3_np[i], 
+								prob2[i], res2[i], cls2_np[i],
+								prob1[i], res1[i], cls1_np[i],
+								prob0[i], res0[i], cls0_np[i]
+							  ]
+				csv_writer.writerow(write_list)
+			csv_file.flush()
+	
+			##############################################################################
+			## The following is the examplar code for dumping the mask into numpy files.
+			## The final version of localization measurement will be updated.
 			## localization. 
-			loss_map, loss_manip, loss_nat = LOSS_MAP(mask1_fea, mask)
-			pred_mask = LOSS_MAP.dis_curBatch.squeeze(dim=1)
-			pred_mask_score = LOSS_MAP.dist.squeeze(dim=1)
+			# loss_map, loss_manip, loss_nat = LOSS_MAP(mask1_fea, mask)
+			# pred_mask = LOSS_MAP.dis_curBatch.squeeze(dim=1)
+			# pred_mask_score = LOSS_MAP.dist.squeeze(dim=1)
 
-			mask_array = mask.cpu().numpy()
-			pred_array = pred_mask.cpu().numpy()
-			scor_array = pred_mask_score.cpu().numpy()
+			# np.save(f'{mask_save_path}/{step}_mask.npy', mask.cpu().numpy())
+			# np.save(f'{mask_save_path}/{step}_pred_mask.npy', pred_mask.cpu().numpy())
+			# np.save(f'{mask_save_path}/{step}_pred_mask_score.npy', pred_mask_score.cpu().numpy())
 
-			## sampling for the validation.
-			mask_array = list(np.reshape(mask_array, -1))[::2000]
-			pred_array = list(np.reshape(pred_array, -1))[::2000]
-			scor_array = list(np.reshape(scor_array, -1))[::2000]
-
-			mask_GT_lst.extend(mask_array)
-			mask_pred_lst.extend(pred_array)
-			mask_scr_lst.extend(scor_array)
-
-			if args.debug_mode and step == 1000:
-				break
-
-	print(f"the image and pixels used for validation are: {len(img_GT_list)} and {len(mask_GT_lst)}")
-	print("...computing the image-wise scores/metrics here...")
-	scor_auc = roc_auc_score(img_GT_list, img_scr_list)
-	print(f"the scr_auc is: {scor_auc:.3f}.")
-	F1 = metrics.f1_score(img_GT_list, img_pred_list, average='macro')
-	print(f"the macro is: {F1:.3f}")
-
-	print("...computing the pixel-wise scores/metrics here...")
-	scor_auc = roc_auc_score(mask_GT_lst, mask_scr_lst)
-	print(f"the scr_auc is: {scor_auc:.3f}.")
-	F1 = metrics.f1_score(mask_GT_lst, mask_pred_lst, average='macro')
-	print(f"the macro is: {F1:.3f}")
+	csv_file.close()
 
 def main(args):
 	## Set up the configuration.
@@ -153,7 +157,6 @@ def main(args):
 	## Model and Optimizer:
 	optimizer, lr_scheduler = setup_optimizer(args, SegNet, FENet)
 	optimizer, initial_iter = restore_weight(args, FENet, SegNet, FENet_dir, SegNet_dir)
-	# initial_iter = 0
 	initial_epoch = int(initial_iter/train_num_per_epoch)
 
 	## Set up the loss function.
@@ -162,87 +165,10 @@ def main(args):
 	BCE_loss = nn.BCELoss(reduction='none').to(device)
 	LOSS_MAP = IsolatingLossFunction(center,radius).to(device)
 
-	for epoch in range(0, args.num_epochs):
-		start_time = time.time()
-		seg_total, seg_correct, seg_loss_sum = [0]*3
-		map_loss_sum, mani_lss_sum, natu_lss_sum, binary_map_loss_sum = [0]*4
-		loss_1_sum, loss_2_sum, loss_3_sum, loss_4_sum = [0]*4
-
-		for step, train_data in enumerate(train_data_loader):
-			iter_num = epoch * train_num_per_epoch + step
-			image, masks, cls0, cls1, cls2, cls3 = train_data
-			image, mask1 = image.to(device), masks[0].to(device)
-			cls0, cls1, cls2, cls3 = cls0.to(device), cls1.to(device), cls2.to(device), cls3.to(device)
-			mask1, mask1_balance = class_weight(mask1, 1)
-
-			# model 
-			output = FENet(image)
-			mask1_fea, mask_binary, out0, out1, out2, out3 = SegNet(output, image)
-			
-			# objective
-			loss_4 = CE_loss(out3, cls3)	# label: 0 --> 13
-			forgery_cls = ~(cls0.eq(0)) # mask real images, only compute the loss_4.
-			if np.sum(forgery_cls.cpu().numpy()) != 0:
-				loss_1 = CE_loss(out0[forgery_cls,:], cls0[forgery_cls])	# label: 0 --> 2
-				loss_2 = CE_loss(out1[forgery_cls,:], cls1[forgery_cls])	# label: 0 --> 4
-				loss_3 = CE_loss(out2[forgery_cls,:], cls2[forgery_cls])	# label: 0 --> 6
-			else:
-				loss_1 = torch.tensor(0.0, requires_grad=True).to(device)
-				loss_2 = torch.tensor(0.0, requires_grad=True).to(device)
-				loss_3 = torch.tensor(0.0, requires_grad=True).to(device)
-			loss_binary_map = BCE_loss(mask_binary, mask1.to(torch.float)) * mask1_balance
-			loss_binary_map = torch.mean(loss_binary_map)
-			loss, loss_manip, loss_nat = LOSS_MAP(mask1_fea, mask1)
-			loss_total = composite_obj(args, loss, loss_1, loss_2, loss_3, loss_4, loss_binary_map)
-			
-			## backpropagate
-			optimizer.zero_grad()
-			loss_total.backward()
-			optimizer.step()
-
-			pred_mask1 = LOSS_MAP.dis_curBatch.squeeze(dim=1)
-			seg_correct += (pred_mask1 == mask1).sum().item()
-			seg_total   += int(torch.ones_like(mask1).sum().item())
-			map_loss_sum += loss.item()
-			mani_lss_sum += loss_manip.item()
-			natu_lss_sum += loss_nat.item()
-			binary_map_loss_sum += loss_binary_map.item()
-			loss_1_sum += loss_1.item()
-			loss_2_sum += loss_2.item()
-			loss_3_sum += loss_3.item()
-			loss_4_sum += loss_4.item()
-
-			if step % args.dis_step == 0:
-				train_log_dump(
-							args, seg_correct, seg_total, map_loss_sum, mani_lss_sum, 
-							natu_lss_sum, binary_map_loss_sum, loss_1_sum, loss_2_sum, 
-							loss_3_sum, loss_4_sum, epoch, step, writer, iter_num,
-							lr_scheduler
-							)
-				schedule_step_loss = composite_obj_step(args, loss_4_sum, map_loss_sum)
-				lr_scheduler.step(schedule_step_loss)
-				## reset
-				seg_total, seg_correct, seg_loss_sum = [0]*3
-				loss_1_sum, loss_2_sum, loss_3_sum, loss_4_sum = [0]*4
-				map_loss_sum, mani_lss_sum, natu_lss_sum, binary_map_loss_sum = [0]*4				
-			
-			if iter_num % args.val_step == 0:
-				print(f"...save the iteration number: {iter_num}.")
-				save_weight(FENet, SegNet, FENet_dir, SegNet_dir, optimizer, iter_num)
-				validation(
-						args, FENet, SegNet, LOSS_MAP, tb_writer=writer, 
-						iter_num=iter_num, save_tag=True, 
-						localization=True
-						)
-				print("after saving the points...")
-
-			if args.debug_mode:
-				args.val_step = 1
-				break
-
-		if args.debug_mode and epoch == 1:
-			print("Finish two complete epoches.")
-			import sys;sys.exit(0)
+	Inference(
+			args, FENet, SegNet, LOSS_MAP, tb_writer=writer, iter_num=initial_iter, save_tag=True, 
+			localization=True
+			)
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -253,8 +179,8 @@ if __name__ == "__main__":
 	parser.add_argument('--lr_backbone', type=float, default=0.9)
 	parser.add_argument('--patience', type=int, default=30)
 	parser.add_argument('--step_factor', type=float, default=0.95)
-	parser.add_argument('--dis_step', type=int, default=500)
-	parser.add_argument('--val_step', type=int, default=1000)
+	parser.add_argument('--dis_step', type=int, default=50)
+	parser.add_argument('--val_step', type=int, default=500)
 
 	## train hyper-parameters
 	parser.add_argument('--crop_size', type=int, default=256)

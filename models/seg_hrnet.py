@@ -22,6 +22,70 @@ import torch.nn.functional as F
 BN_MOMENTUM = 0.01
 logger = logging.getLogger(__name__)
 
+# noise generation
+def srm_generation(image):
+    """
+    :param image: N * C * H * W
+    :return: noises
+    """
+
+    # srm kernel 1
+    srm1 = np.zeros([5, 5]).astype('float32')
+    srm1[1:-1, 1:-1] = np.array([[-1, 2, -1],
+                                 [2, -4, 2],
+                                 [-1, 2, -1]])
+    srm1 /= 4.
+    # srm kernel 2
+    srm2 = np.array([[-1, 2, -2, 2, -1],
+                     [2, -6, 8, -6, 2],
+                     [-2, 8, -12, 8, -2],
+                     [2, -6, 8, -6, 2],
+                     [-1, 2, -2, 2, -1]]).astype('float32')
+    srm2 /= 12.
+    # srm kernel 3
+    srm3 = np.zeros([5, 5]).astype('float32')
+    srm3[2, 1:-1] = np.array([1, -2, 1])
+    srm3 /= 2.
+
+    srm = np.stack([srm1, srm2, srm3], axis=0)
+
+    W_srm = np.zeros([3, 3, 5, 5]).astype('float32')
+
+    for i in range(3):
+        W_srm[i, 0, :, :] = srm[i, :, :]
+        W_srm[i, 1, :, :] = srm[i, :, :]
+        W_srm[i, 2, :, :] = srm[i, :, :]
+
+    W_srm = torch.from_numpy(W_srm).to(image.get_device())
+
+    srm_noise = F.conv2d(image, W_srm, padding=2)
+
+    return srm_noise
+
+# bayar constrained layer
+class BayarConstraint(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, module):
+        if hasattr(module, 'weight'):
+            weight = module.weight.data      # oc, ic, h, w
+
+            h, w = weight.size()[2:]
+            mask = torch.zeros_like(weight)
+            mask[:, :, h//2, w//2] = 1
+
+            weight *= (1 - mask)
+            rest_sum = torch.sum(weight, dim=(2, 3), keepdim=True)
+            weight /= (rest_sum + 1e-7)
+            weight -= mask
+            module.weight.data = weight
+
+def conv3x3(in_planes, out_planes, stride=1):
+    """3x3 convolution with padding"""
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
+                     padding=1, bias=False)
+
 class CatDepth(nn.Module):
     def __init__(self):
         super(CatDepth, self).__init__()
