@@ -202,9 +202,6 @@ class BranchCLS(nn.Module):
 class NLCDetection(nn.Module):
     def __init__(self):
         super(NLCDetection, self).__init__()
-        self.crop_size = 256
-        # self.device = torch.device('cuda:0,1,2')
-        # self.split_tensor = torch.tensor([1, 3]).to(self.device)
         self.split_tensor_1 = torch.tensor([1, 3]).cuda()
         self.split_tensor_2 = torch.tensor([1, 2, 1, 3]).cuda()
         self.softmax_m = nn.Softmax(dim=1)
@@ -221,10 +218,8 @@ class NLCDetection(nn.Module):
         self.branch_cls_level_4 = BranchCLS(144, 3)    # 144
 
     def forward(self, feat, img):
-        # print("...coming inside the NLCDetection...")
         s1, s2, s3, s4 = feat
 
-        # mask_binary is intermediate result, to ignore.
         pconv_feat, mask, mask_binary = self.getmask(s1, img)
         pconv_feat = pconv_feat.clone().detach()
 
@@ -275,25 +270,5 @@ class NLCDetection(nn.Module):
         s2F = F.interpolate(s2_input, size=s1.size()[2:], mode='bilinear', align_corners=True)
         s1_input = torch.cat([s2F, s1, pconv_1], axis=1)
         cls_1, pro_1, _ = self.branch_cls_level_1(s1_input) 
-        # cls_prob_1      = self.softmax_m(pro_1) 
         cls_1 = cls_1 + cls_1 * cls_prob_mask_1
-
-        # print(cls_4.size(), pro_4.size())     # torch.Size([16, 3])
-        # print(cls_3.size(), pro_3.size())     # torch.Size([16, 5])
-        # print(cls_2.size(), pro_2.size())     # torch.Size([16, 7])
-        # print(cls_1.size(), pro_1.size())     # torch.Size([16, 14])
-        # print("...over...")
-        # print("...coming here...")
-        # print("...coming here...")
-        # import sys;sys.exit(0)
-
-        ## mask, [bs, 3], [bs, 5], [bs, 7], [bs, 14]
-        ## [bs, 3]: full mani. v.s. partial man.
-        ## [bs, 5]: editing v.s. CNN-based v.s. GAN v.s. Diffusion
-        ## [bs, 7]: editing v.s. CNN-based v.s. uncon/con GAN v.s. uncon/con Diffusion 
-        ## [bs, 14]: three splicing v.s. CNN-based 
         return mask, mask_binary, cls_4, cls_3, cls_2, cls_1
-        # loss_1 = CE_loss(cls_1, label_level1)    # label: 0 --> 13
-        # loss_2 = CE_loss(cls_2, label_level2)    # label: 0 --> 6
-        # loss_3 = CE_loss(cls_3, label_level3)    # label: 0 --> 4
-        # loss_4 = CE_loss(cls_4, label_level4)    # label: 0 --> 2
