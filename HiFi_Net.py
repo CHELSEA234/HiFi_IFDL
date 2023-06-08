@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import argparse
-import imageio.v2 as imageio
+import imageio as imageio
 
 class HiFi_Net():
     '''
