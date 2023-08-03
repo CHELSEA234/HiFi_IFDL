@@ -12,7 +12,8 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 - Per many email requests, we release our first version source code for the reference. 
 - ~~Apologize that this is not the finalized version code, which will be released soon along with the dataset~~
 - Update the inference interface and test.py
-- **the dataset and a DAPRA sponsored image forensic demo will be released soon**
+- The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
+- **the DAPRA sponsored image forensic demo will be released soon**
 - **this github will keep updated, please stay tuned~**
 
 ### Short 5 Min Video 
