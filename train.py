@@ -140,6 +140,8 @@ def validation(
             elif step == 10:
                 break
 
+    FENet.train()
+    SegNet.train()
     print("...computing the pixel-wise scores/metrics here...")
     print(f"the scr_auc is: {np.mean(auc_lst):.3f}.")
     print(f"the macro is: {np.mean(F1_lst):.3f}")
@@ -212,6 +214,8 @@ def Inference(
                 elif step == 180:
                     break
 
+        FENet.train()
+        SegNet.train()
         print("F1: ", np.mean(F1_lst))
         print("AUC: ", np.mean(auc_lst))
 

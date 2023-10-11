@@ -87,9 +87,6 @@ class HiFi_Net():
         """
         with torch.no_grad():
             img_input = self._transform_image(image_name)
-
-            print("the input image shape: ", img_input.size())
-            import sys;sys.exit(0)
             output = self.FENet(img_input)
             mask1_fea, mask1_binary, out0, out1, out2, out3 = self.SegNet(output, img_input)
             pred_mask, pred_mask_score = self.LOSS_MAP.inference(mask1_fea)   # inference
@@ -118,6 +115,6 @@ def inference(img_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--img_path', type=str, default='asset/a_100t.jpg')
+    parser.add_argument('--img_path', type=str, default='asset/sample_1.jpg')
     args = parser.parse_args()
     inference(args.img_path)
