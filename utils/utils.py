@@ -15,6 +15,9 @@ from kmeans_pytorch import kmeans
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from sklearn import metrics
+from torchvision.utils import make_grid
+from einops import rearrange
+from PIL import Image
 
 Softmax_m = nn.Softmax(dim=1)
 device = torch.device('cuda:0')
@@ -59,16 +62,6 @@ def compute_cls_acc_f1(label_lst, pred_lst, iter_num, tb_writer, descr='Val/leve
     print(f"In {descr}, the image-level Acc: {acc:.3f}, F1: {F1:.3f}.")
     print("******************************************************")
     return F1, acc
-
-def compute_infer(label_lst, pred_lst, iter_num, tb_writer, descr='Inference'):
-    F1  = metrics.f1_score(label_lst, pred_lst, average='macro')
-    acc = metrics.accuracy_score(label_lst, pred_lst)
-    acc_0, acc_1, thre, AUC = evaluate(label_lst, pred_lst, pos_label=1)
-    tb_writer.add_scalar(f'{descr}_F1', F1, iter_num)
-    tb_writer.add_scalar(f'{descr}_acc', acc, iter_num)
-    # print(f"In {descr}, the image-level Acc: {acc:.3f}, F1: {F1:.3f}, AUC: {AUC:.3f}.")
-    # print("******************************************************")
-    return F1, acc, AUC
 
 def tb_writer_display(writer, iter_num, lr_scheduler, epoch, 
                       seg_accu, loc_map_loss, manipul_loss, natural_loss, binary_loss,
@@ -147,24 +140,16 @@ def setup_optimizer(args, SegNet, FENet):
     '''setup the optimizier, which applies different learning rate on different layers.'''
     '''different hyper-parameters are changed towards HiFi-IFDL dataset.'''
     params_dict_list = []
-    params_dict_list.append({'params' : SegNet.module.getmask.parameters(), 'lr' : args.learning_rate*1.2})
-    params_dict_list.append({'params' : SegNet.module.branch_cls_level_3.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append(
-                        {'params' : SegNet.module.branch_cls_level_2.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append(
-                        {'params' : SegNet.module.branch_cls_level_1.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append({'params' : FENet.module.stage4[0].fuse_layers.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append({'params' : FENet.module.stage3[0].fuse_layers.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append({'params' : FENet.module.stage2[0].fuse_layers.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append({'params' : FENet.module.transition1.parameters(), 'lr' : args.learning_rate})
-    params_dict_list.append({'params' : FENet.module.conv_1x1_merge.parameters(), 'lr' : args.learning_rate})
-    ## newly-added layer will have the larger learning rate.
-    ## newly-added layer will have the larger learning rate.
-    ## 0.75 ==> 1
-    params_dict_list.append({'params' : FENet.module.conv1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
-    params_dict_list.append({'params' : FENet.module.bn1fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
-    params_dict_list.append({'params' : FENet.module.conv2fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
-    params_dict_list.append({'params' : FENet.module.bn2fre.parameters(), 'lr' : args.learning_rate*args.lr_backbone})
+    params_dict_list.append({'params' : SegNet.module.parameters(), 'lr' : args.learning_rate})
+    freq_list = []
+    para_list = []
+    for name, param in FENet.named_parameters():
+        if 'fre' in name:
+            freq_list += [param]
+        else:
+            para_list += [param]
+    params_dict_list.append({'params' : freq_list, 'lr' : args.learning_rate*args.lr_backbone})
+    params_dict_list.append({'params' : para_list, 'lr' : args.learning_rate})
 
     optimizer    = torch.optim.Adam(params_dict_list, lr=args.learning_rate*0.75, weight_decay=1e-06)
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=args.step_factor, min_lr=1e-08,
@@ -208,7 +193,7 @@ def composite_obj(args, loss, loss_1, loss_2, loss_3, loss_4, loss_binary):
     elif args.ablation == 'fg':     # only fine-grained
         loss_total = loss_1 + loss_2 + loss_3 + loss_4
     elif args.ablation == 'local':  # only loclization
-        loss_total = loss + loss_1 + loss_2 + loss_3 + loss_4
+        loss_total = loss + 10e-6*(loss_1 + loss_2 + loss_3 + loss_4)
     else:
         assert False
     return loss_total
@@ -226,6 +211,53 @@ def composite_obj_step(args, loss_4_sum, map_loss_sum):
     else:
         assert False
     return schedule_step_loss
+
+def viz_log(args, mask, pred_mask, image, iter_num, step, mode='train'):
+    '''viz training, val and inference.'''
+    mask = torch.unsqueeze(mask, dim=1)
+    pred_mask = torch.unsqueeze(pred_mask, dim=1)
+    mask_viz = torch.cat([mask]*3, axis=1)
+    pred_mask = torch.cat([pred_mask]*3, axis=1)
+    image = torch.nn.functional.interpolate(image,  # for viz.
+                                          size=(256, 256), 
+                                          mode='bilinear')
+    fig_viz = torch.cat([mask_viz, image, pred_mask], axis=0)
+    grid = make_grid(fig_viz, nrow=mask_viz.shape[0])   # nrow in fact is the column number.
+    grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
+    img_h = Image.fromarray(grid.astype(np.uint8))
+    os.makedirs(f"./viz_{mode}_{args.learning_rate}/", exist_ok=True)
+    if mode == 'train':
+        img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}.jpg")
+    else:
+        img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}_step_{step}.jpg")
+
+def process_mask(mask, pred_mask):
+    '''process the mask'''
+    pred_mask = torch.unsqueeze(pred_mask, dim=1)
+    mask = torch.unsqueeze(mask, dim=1)
+    pred_mask = torch.cat([pred_mask]*3, axis=1)
+    mask = torch.cat([mask]*3, axis=1)
+
+    pred_mask = nn.functional.interpolate(pred_mask, 
+                                        size=(256, 256), mode='bilinear')
+    mask = nn.functional.interpolate(mask, 
+                                    size=(256, 256), mode='bilinear')
+
+    return pred_mask, mask
+
+def viz_logs_scale(args, iter_num, mask_128, mask_64, mask_32, mask2, mask3, mask4, mode='train'):
+    '''visualize the mask and predicted mask.'''
+    pred_mask_128, mask128 = process_mask(mask_128, mask2)
+    pred_mask_64, mask64 = process_mask(mask_64, mask3)
+    pred_mask_32, mask32 = process_mask(mask_32, mask4)
+
+    fig_viz = torch.cat([pred_mask_32, mask32, pred_mask_64, mask64, 
+                        pred_mask_128, mask128], axis=0)
+    grid = make_grid(fig_viz, nrow=pred_mask_32.shape[0])
+    grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
+    img_h = Image.fromarray(grid.astype(np.uint8))
+    os.makedirs(f"./viz_{mode}_{args.learning_rate}/", exist_ok=True)
+    img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}_pred.jpg")
 
 def train_log_dump(args, seg_correct, seg_total, map_loss_sum, mani_lss_sum, natu_lss_sum,
                     binary_map_loss_sum, loss_1_sum, loss_2_sum, loss_3_sum,

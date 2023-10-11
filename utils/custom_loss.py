@@ -12,20 +12,21 @@ device = torch.device('cuda:0')
 device_ids = [0]
 
 class IsolatingLossFunction(torch.nn.Module):
-	def __init__(self, c, R, p=2):
+	def __init__(self, c, R, p=2, threshold_val=1.85):
 		super().__init__()
 		self.c = c.clone().detach() # Center of the hypershpere, c ∈ ℝ^d (d-dimensional real-valued vector)
 		self.R = R.clone().detach() # Radius of the hypersphere, R ∈ ℝ^1 (Real-valued)
 		self.p = p                  # norm value (p-norm), p ∈ ℝ^1 (Default 2)
 		self.margin_natu = (0.15)*self.R    
 		self.margin_mani = (2.5)*self.R
-		self.threshold   = 1.85*self.R
+		self.threshold   = threshold_val*self.R
 
 		print('\n')
 		print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 		print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 		print(f'The Radius manipul is {self.margin_natu}.')
 		print(f'The Radius expansn is {self.margin_mani}.')
+		print(f'The Radius threshold is {self.threshold}.')
 		print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 		print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 		print('\n')
