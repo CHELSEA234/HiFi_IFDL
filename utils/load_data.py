@@ -271,7 +271,7 @@ class TrainData(BaseData):
         if self.is_train:
             contents_lst = contents[:val_num]
         else:
-            contents_lst = contents[-val_num:]
+            contents_lst = contents[val_num:]
 
         for content in contents_lst:
             if '.npy' not in content and 'mask' not in content:
