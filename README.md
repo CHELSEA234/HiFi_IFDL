@@ -1,6 +1,6 @@
 # HiFi_IFDL
 
-This is the source code for image editing detection and localization, as well as the diffusion model attribution. Our work has been accepted by CVPR $2023$, titled as "*Hierarchical Fine-Grained Image Forgery Detection and Localization*". [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
+This is the source code for image editing detection and localization. Our work has been accepted by CVPR $2023$, titled as "*Hierarchical Fine-Grained Image Forgery Detection and Localization*". [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
 
 Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en), [Xiaohong Liu](https://jhc.sjtu.edu.cn/~xiaohongliu/), [Iacopo Masi](https://iacopomasi.github.io/), [Xiaoming Liu](http://cvlab.cse.msu.edu/)
 
@@ -9,22 +9,39 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 </p>
 
 ### Updates.
-- Per many email requests, we release our first version source code for the reference. 
+- ~~Per many email requests, we release our first version source code for the reference.~~
 - ~~Apologize that this is not the finalized version code, which will be released soon along with the dataset~~
-- Update the inference interface and test.py
+- ~~Update the inference interface and test.py~~
 - The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
-- **the DAPRA sponsored image forensic demo will be released soon**
+- ~~The DAPRA video will be released soon.~~
+- The DAPRA sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
+- We release the training, evaluation and pre-trained weights for the localization task, please refer the following contents.
+- The extended version of our work has been submitted to one of Machine Learning Journals. 
 - **this github will keep updated, please stay tuned~**
 
 ### Short 5 Min Video 
 [![Please Click the Figure](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/architecture.png)](https://www.youtube.com/watch?v=FwS3X5xcj8A&list=LL&index=5)
 
-### Quick Usage:
+### Quick Usage on Manipulation Localization:
 - To create your own environment by:
   ```
   conda env create -f environment.yml
   ```
-- Go to this [link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights and put them in `weights`. 
+- Go to [localization_weights_link](https://drive.google.com/drive/folders/1cxCoE2hjcDj4lLrJmGEbskzPRJfoDIMJ?usp=sharing) to download the weights from, and then put them in `weights`.
+- Run
+  ```
+  bash HiFi_Net_loc.sh
+  ```
+- The final [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and output [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing) are available to play around with.
+- If you would like to use deep-metric localization loss, then please do the following command in the bash file.
+  ```
+  ...
+  CUDA_VISIBLE_DEVICES=$CUDA_NUM python HiFi_Net_loc.py --loss_type="dm"
+  ```
+  we only train `--loss_type="dm"` for the splicing images, and the complete weights are released upon the journal acceptance. Please forgive us for the ince
+
+### Quick Usage on Detection and Localization:
+- Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
 - The quick usage on HiFi_Net:
 ```python
   from HiFi_Net import HiFi_Net 
@@ -50,12 +67,11 @@ The quick view on the code structure:
 ```bash
 ./HiFi_IFDL
     ├── train.py
-    ├── train.sh (call train.py to run the training)
-    ├── test.py
-    ├── test.sh (call test.py to produce numerical results on the testing dataset)
-    ├── test.py
+    ├── train.sh 
+    ├── HiFi_Net_loc.py (localization files)
+    ├── HiFi_Net_loc.sh (localization evaluation)
     ├── HiFi_Net.py (API for the user input image.)
-    ├── IMD_dataloader.py (call train and val dataloaders.)
+    ├── IMD_dataloader.py (call dataloaders in the utils folder)
     ├── model (model module folder)
     │      ├── NLCDetection_pconv.py (partial convolution, localization and classification modules)
     │      ├── seg_hrnet.py (feature extrator based on HRNet)
@@ -65,14 +81,12 @@ The quick view on the code structure:
     ├── utils (utils, dataloader, and localization loss class.)
     │      ├── custom_loss.py (localization loss class and the real pixel center initialization)
     │      ├── utils.py
-    │      ├── load_tdata.py (loading dataset/ will be improved :) )
-    │      ├── load_vdata.py (loading val/testing dataset/ will be improved :) )
-    │      ├── load_vdata.py (loading val/testing dataset/ will be improved :) )
-    │      └── result_parse_localization.py (produce the numerical localization results.)
-    │      └── result_parse_detection.py (produce the numerical detection results.)
+    │      ├── load_data.py (loading traininga and val dataset.)
+    │      └── load_edata.py (loading inference dataset.)
     ├── asset (folder contains sample images with their ground truth and predictions.)
     ├── weights (put the pre-trained weights in.)
-    └── center (The pre-computed `.pth` file to represent the center used in the localization loss.)
+    ├── center (The pre-computed `.pth` file for the HiFi-IFDL dataset.)
+    └── center_loc (The pre-computed `.pth` file for the localization task (Tab.3 in the paper).)
 ```
 
 ### Reference
