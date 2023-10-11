@@ -8,15 +8,16 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
   <img src="https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/overview_4.png" alt="drawing" width="1000"/>
 </p>
 
-### Updates.
+### <a name="update"></a> Updates.
 - ~~Per many email requests, we release our first version source code for the reference.~~
 - ~~Apologize that this is not the finalized version code, which will be released soon along with the dataset~~
 - ~~Update the inference interface and test.py~~
 - The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
 - ~~The DAPRA video will be released soon.~~
 - The DAPRA sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
-- We release the training, evaluation and pre-trained weights for the localization task, please refer the following contents.
-- The extended version of our work has been submitted to one of Machine Learning Journals. 
+- We release new pre-trained weights for the localization task, please refer the following contents.
+- I gather important concerns and questions from the issues and offer answers in the QA section in the bottom.
+- The extended version of our work has been submitted to one of Machine Learning Journals.
 - **this github will keep updated, please stay tuned~**
 
 ### Short 5 Min Video 
@@ -88,6 +89,19 @@ The quick view on the code structure:
     ├── center (The pre-computed `.pth` file for the HiFi-IFDL dataset.)
     └── center_loc (The pre-computed `.pth` file for the localization task (Tab.3 in the paper).)
 ```
+
+### Question and Answers.
+Q1. Why train and val dataset are in the same path? 
+
+A1. For each forgery method, we save both train and val in the SAME folder, from which we use a text file to obtain the training and val images. The text file contains list of image names, and first `val_num` are used for training and last "val_num" for validation. Specifically refer to [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L271) for details. What is more, we build up the code on the top of the PSCC-Net, which adapts the same style of loading data, please compare [code1](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L88) with [code2](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L290).
+
+Q2. What is the dataset naming for STGAN and faceshifter section?
+
+A2. Please check the STGAN.txt in this [link](https://drive.google.com/drive/folders/1OIUv7OGxfAyerMnmKvrNnN_5CmIDcNxo?usp=sharing), which contains all manipulated/modified images we have used for training and validation. This txt file will be loaded by this line of [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L163), which says about the corresponding masks. Lastly, I am not sure if I have release the authentic images, if I do not, you can simply find them in the public celebAHQ dataset. I will try to offer the rigid naming for the dataset in the near future. 
+
+Q3. The training script does not make the loss down.
+
+A3. As indicated in [Updates Section](#update), before October, we only release the code for the reference. Now, we have updated one of training codes we have used and may not reflect a specific combination of hyper-parameters presented in the paper. One heads up is to replace the localization loss with cross entropy, which can generate competitive performance and save you from using all real pixels to compute the center. If you insist on learning more on the localization loss that we have used in the paper, please take a look at this [screenshot](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/tb_viz.png), which I collect from the previous experiment. This figure demonstrates the loss decreases after the careful choosing a set of hyper-parameters, and it can take much time for map_loss to get converged. 
 
 ### Reference
 If you would like to use our work, please cite:
