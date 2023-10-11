@@ -39,7 +39,7 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
   ...
   CUDA_VISIBLE_DEVICES=$CUDA_NUM python HiFi_Net_loc.py --loss_type="dm"
   ```
-  we only train `--loss_type="dm"` for the splicing images, and the complete weights are released upon the journal acceptance. Please forgive us for the ince
+  we only train `--loss_type="dm"` for the splicing images, and the complete weights are released soon.
 
 ### Quick Usage on Detection and Localization:
 - Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
