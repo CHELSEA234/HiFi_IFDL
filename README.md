@@ -101,7 +101,7 @@ A2. Please check the STGAN.txt in this [link](https://drive.google.com/drive/fol
 
 Q3. The training script does not make the loss down.
 
-A3. As indicated in [Updates Section](#update), before October, we only release the code for the reference. Now, we have updated one of training codes we have used and may not reflect a specific combination of hyper-parameters presented in the paper. One heads up is to replace the localization loss with cross entropy, which can generate competitive performance and save you from using all real pixels to compute the center. If you insist on learning more on the localization loss that we have used in the paper, please take a look at this [screenshot](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/tb_viz.png), which I collect from the previous experiment. This figure demonstrates the loss decreases after the careful choosing a set of hyper-parameters, and it can take much time for map_loss to get converged. 
+A3. As indicated in [Updates Section](#update), before October, we only release the code for the reference. Now, we have updated one of training codes we have used and may not reflect a specific combination of hyper-parameters presented in the paper. If you want to learn more on the training, please take a look at this [screenshot](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/tb_viz.png), which I collect from the previous experiment. This figure demonstrates the loss decreases after the careful choosing a set of hyper-parameters, and it can take much time for map_loss to get converged. 
 
 ### Reference
 If you would like to use our work, please cite:
