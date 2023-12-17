@@ -186,7 +186,6 @@ def restore_optimizer(optimizer, model_dir):
 def composite_obj(args, loss, loss_1, loss_2, loss_3, loss_4, loss_binary):
     ''' 'base', 'fg', 'local', 'full' '''
     if args.ablation == 'full':     # fine-grained + localization
-        # loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
         loss_total = 100*loss + loss_1 + loss_2 + loss_3 + 100*loss_4 + loss_binary
     elif args.ablation == 'base':   # one-shot
         loss_total = loss_4
@@ -225,11 +224,14 @@ def viz_log(args, mask, pred_mask, image, iter_num, step, mode='train'):
     grid = make_grid(fig_viz, nrow=mask_viz.shape[0])   # nrow in fact is the column number.
     grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
     img_h = Image.fromarray(grid.astype(np.uint8))
-    os.makedirs(f"./viz_{mode}_{args.learning_rate}/", exist_ok=True)
+    # os.makedirs(f"./viz_{mode}_{args.learning_rate}/", exist_ok=True)
+    os.makedirs(f"./viz_{mode}/", exist_ok=True)
     if mode == 'train':
-        img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}.jpg")
+        # img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}.jpg")
+        img_h.save(f"./viz_{mode}/iter_{iter_num}.jpg")
     else:
-        img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}_step_{step}.jpg")
+        # img_h.save(f"./viz_{mode}_{args.learning_rate}/iter_{iter_num}_step_{step}.jpg")
+        img_h.save(f"./viz_{mode}/iter_{iter_num}_step_{step}.jpg")
 
 def process_mask(mask, pred_mask):
     '''process the mask'''

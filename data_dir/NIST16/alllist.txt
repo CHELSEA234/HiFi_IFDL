@@ -1,0 +1,3 @@
+probe/NC2016_0016.jpg mask/mani_NC2016_0940.png
+probe/NC2016_0128.jpg mask/mani_NC2016_3942.png
+probe/NC2016_0130.jpg mask/mani_NC2016_6409.png

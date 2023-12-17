@@ -15,6 +15,10 @@ class BaseData(data.Dataset):
     def __init__(self, args):
         super(BaseData, self).__init__()
         self.crop_size = args.crop_size
+        ## demo dataset:
+        self.mani_data_dir = './data_dir'
+        ## the full dataset:
+        # self.mani_data_dir = './data'
         self.image_names = []
         self.image_class = []
         self.mask_names  = []
@@ -30,7 +34,6 @@ class BaseData(data.Dataset):
         '''
             generate the corresponding binary mask.
         '''
-        mask_pil = Image.fromarray(mask)
         mask = mask.astype(np.float32) / 255
         mask[mask > 0.5] = 1
         mask[mask <= 0.5] = 0
@@ -104,20 +107,13 @@ class BaseData(data.Dataset):
 class ValColumbia(BaseData):
     def __init__(self, args):
         super(ValColumbia, self).__init__(args)
-        ddir = '/user/guoxia11/cvl/semi_supervise_local/2021/05_25_SCCM/Dataset/finetune_dataset/'
-        ddir += 'columbia/'
+        ddir = os.path.join(self.mani_data_dir, 'columbia')
         with open(join(ddir, 'vallist.txt')) as f:
             contents = f.readlines()
             for content in contents:
-                self.image_names.append(content.strip())
+                _ = os.path.join(ddir, '4cam_splc', content.strip())
+                self.image_names.append(_)
         self.image_class = [1] * len(self.image_names)
-
-        # ddir = '/user/guoxia11/cvlshare/cvl-guoxia11/IMDL/benchmark/columbia/'
-        # with open(join(ddir, 'authentic_list.txt')) as f:
-        #     contents = f.readlines()
-        #     for content in contents:
-        #         self.image_names.append(ddir + content.strip())
-        #         self.image_class.append(0)
 
     def get_item(self, index):
         image_name = self.image_names[index]
@@ -138,12 +134,12 @@ class ValColumbia(BaseData):
 class ValCoverage(BaseData):
     def __init__(self, args):
         super(ValCoverage, self).__init__(args)
-        ddir = '/user/guoxia11/cvl/semi_supervise_local/2021/05_25_SCCM/Dataset/finetune_dataset'
-        ddir += '/Coverage'
+        ddir = os.path.join(self.mani_data_dir, 'Coverage')
         with open(join(ddir, 'fake.txt')) as f:
             contents = f.readlines()
             for content in contents:
-                self.image_names.append(content.strip())
+                _ = os.path.join(ddir, 'image', content.strip())
+                self.image_names.append(_)
         self.image_class = [2] * len(self.image_names)
 
     def get_item(self, index):
@@ -162,7 +158,7 @@ class ValCoverage(BaseData):
 class ValCasia(BaseData):
     def __init__(self, args):
         super(ValCasia, self).__init__(args)
-        ddir = '/research/cvl-guoxia11/semi_supervise_local/2021/05_25_SCCM/Dataset/finetune_dataset/CASIA/CASIA1/'
+        ddir = os.path.join(self.mani_data_dir, 'CASIA/CASIA1')
         with open(join(ddir, 'fake.txt')) as f:
             contents = f.readlines()
             for content in contents:
@@ -175,7 +171,7 @@ class ValCasia(BaseData):
                     raise Exception('unknown class: {}'.format(content))
                 self.image_names.append(os.path.join(ddir, 'fake', content.strip()))
 
-        ddir = '/research/cvl-guoxia11/semi_supervise_local/2021/05_25_SCCM/Dataset/finetune_dataset/CASIA/CASIA2/'
+        ddir = os.path.join(self.mani_data_dir, 'CASIA/CASIA2')
         with open(join(ddir, 'fake.txt')) as f:
             contents = f.readlines()
             for content in contents:
@@ -207,7 +203,7 @@ class ValCasia(BaseData):
 class ValNIST16(BaseData):
     def __init__(self, args):
         super(ValNIST16, self).__init__(args)
-        ddir = '/user/guoxia11/cvl/semi_supervise_local/2021/05_25_SCCM/Dataset/finetune_dataset/NIST16/NIST16/'
+        ddir = os.path.join(self.mani_data_dir, 'NIST16')
         file_name = 'alllist.txt'
         with open(join(ddir, file_name)) as f:
             contents = f.readlines()
@@ -250,7 +246,7 @@ class ValNIST16(BaseData):
 class ValIMD2020(BaseData):
     def __init__(self, args):
         super(ValIMD2020, self).__init__(args)
-        ddir = '/user/guoxia11/cvlshare/cvl-guoxia11/IMDL/benchmark/IMD2020/'
+        ddir = os.path.join(self.mani_data_dir, 'IMD2020')
         file_name = 'fake.txt'
         with open(join(ddir, file_name)) as f:
             contents = f.readlines()
@@ -272,7 +268,6 @@ class ValIMD2020(BaseData):
             image = self.get_image(image_name)
         except:
             print(f"Fail at {image_name}.")
-            # import sys;sys.exit(0)
         mask = self.get_mask(mask_name)
 
         return image, mask, cls, image_name

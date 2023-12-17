@@ -18,9 +18,6 @@ class LaPlacianMs(nn.Module):
         self.smoothing = nn.ModuleDict()
         for s in self.scale:
             self.smoothing['scale-'+str(s)] = GaussianSmoothing(in_c, self.gauss_ker_size, s)
-        # print("===================")
-        # print(self.smoothing.keys())
-        # import sys;sys.exit(0)
         self.conv_1x1 = nn.Sequential(nn.Conv2d(in_c*len(scale), in_c,
                                                 kernel_size=1, stride=1,
                                                 bias=False,groups=1),
@@ -46,18 +43,10 @@ class LaPlacianMs(nn.Module):
         return F.interpolate(x,size=size,mode='bilinear',align_corners=False)
 
     def forward(self, x):
-        # print(self.scale)
-        # import sys;sys.exit(0)
         for i, s in enumerate(self.scale):
-            # print()
-            # print(x.size())
             sm = self.smoothing['scale-'+str(s)](x)
-            # print(sm.size())
             sm = self.down(sm,1/s)
-            # print(sm.size())
             sm = self.up(sm,(x.shape[2],x.shape[3]))
-            # print(sm.size())
-            # print("========================")
             if i == 0:
                 diff = x - sm
             else:
