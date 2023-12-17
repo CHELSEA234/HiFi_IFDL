@@ -9,14 +9,9 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 </p>
 
 ### <a name="update"></a> Updates.
-- ~~Per many email requests, we release our first version source code for the reference.~~
-- ~~Apologize that this is not the finalized version code, which will be released soon along with the dataset~~
-- ~~Update the inference interface and test.py~~
 - The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
-- ~~The DAPRA video will be released soon.~~
 - The DAPRA sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
 - We release new pre-trained weights for the localization task, please refer the following contents.
-- I gather important concerns and questions from the issues and offer answers in the QA section in the bottom.
 - The extended version of our work has been submitted to one of Machine Learning Journals.
 - **this github will keep updated, please stay tuned~**
 
@@ -29,19 +24,13 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
   conda env create -f environment.yml
   ```
 - Go to [localization_weights_link](https://drive.google.com/drive/folders/1cxCoE2hjcDj4lLrJmGEbskzPRJfoDIMJ?usp=sharing) to download the weights from, and then put them in `weights`.
-- Run
+- To apply the pre-trained model on images in the `./data_dir` and then obtain results in `./viz_eval`, please run
   ```
   bash HiFi_Net_loc.sh
   ```
-- The final [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and output [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing) are available to play around with.
-- If you would like to use deep-metric localization loss, then please do the following command in the bash file.
-  ```
-  ...
-  CUDA_VISIBLE_DEVICES=$CUDA_NUM python HiFi_Net_loc.py --loss_type="dm"
-  ```
-  we only train `--loss_type="dm"` for the splicing images, and the complete weights are released soon.
+- More quantitative and qualitative results can be found at: [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing).
 
-### Quick Usage on Detection and Localization:
+### Quick Usage on the IFDL dataset:
 - Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
 - The quick usage on HiFi_Net:
 ```python
