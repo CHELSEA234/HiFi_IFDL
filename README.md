@@ -11,14 +11,13 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 ### <a name="update"></a> Updates.
 - The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
 - The DAPRA sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
-- We release new pre-trained weights for the localization task, please refer the following contents.
 - The extended version of our work has been submitted to one of Machine Learning Journals.
 - **this github will keep updated, please stay tuned~**
 
 ### Short 5 Min Video 
 [![Please Click the Figure](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/architecture.png)](https://www.youtube.com/watch?v=FwS3X5xcj8A&list=LL&index=5)
 
-### Quick Usage on Manipulation Localization:
+### Usage on Manipulation Localization (_e.g._, Columbia, Coverage, CASIA, NIST16 and IMD2020)
 - To create your own environment by:
   ```
   conda env create -f environment.yml
@@ -29,8 +28,9 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
   bash HiFi_Net_loc.sh
   ```
 - More quantitative and qualitative results can be found at: [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing).
+- If you would like to generate the above result. Download $5$ datasets via [link](https://drive.google.com/file/d/1RYXTg0Q82KEvkeOtaaR5AZ0FBx5219SY/view?usp=sharing) and unzip it by `tar -xvf data.tar.gz`. Then, uncomment this [line](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_edata.py#L21) and run `HiFi_Net_loc.sh`. 
 
-### Quick Usage on the IFDL dataset:
+### Usage on the detection and localization in the HiFi-IFDL dataset:
 - Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
 - The quick usage on HiFi_Net:
 ```python
@@ -56,8 +56,7 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 The quick view on the code structure:
 ```bash
 ./HiFi_IFDL
-    ├── train.py
-    ├── train.sh 
+    ├── train.py (reference training code)
     ├── HiFi_Net_loc.py (localization files)
     ├── HiFi_Net_loc.sh (localization evaluation)
     ├── HiFi_Net.py (API for the user input image.)
