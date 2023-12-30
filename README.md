@@ -18,10 +18,11 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 [![Please Click the Figure](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/architecture.png)](https://www.youtube.com/watch?v=FwS3X5xcj8A&list=LL&index=5)
 
 ### Usage on Manipulation Localization (_e.g._, Columbia, Coverage, CASIA, NIST16 and IMD2020)
-- To create your own environment by:
+- To create your own environment by
   ```
   conda env create -f environment.yml
   ```
+  or mannually install `pytorch 1.11.0` and `torchvision 0.12.0` in `python 3.7.16`.
 - Go to [localization_weights_link](https://drive.google.com/drive/folders/1cxCoE2hjcDj4lLrJmGEbskzPRJfoDIMJ?usp=sharing) to download the weights from, and then put them in `weights`.
 - To apply the pre-trained model on images in the `./data_dir` and then obtain results in `./viz_eval`, please run
   ```
@@ -30,7 +31,7 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 - More quantitative and qualitative results can be found at: [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing).
 - If you would like to generate the above result. Download $5$ datasets via [link](https://drive.google.com/file/d/1RYXTg0Q82KEvkeOtaaR5AZ0FBx5219SY/view?usp=sharing) and unzip it by `tar -xvf data.tar.gz`. Then, uncomment this [line](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_edata.py#L21) and run `HiFi_Net_loc.sh`. 
 
-### Usage on the detection and localization in the HiFi-IFDL dataset:
+### Usage on the detection and localization in the HiFi-IFDL dataset (Tab. 2 and Supplementary Fig.1):
 - Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
 - The quick usage on HiFi_Net:
 ```python
@@ -56,7 +57,6 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 The quick view on the code structure:
 ```bash
 ./HiFi_IFDL
-    ├── train.py (reference training code)
     ├── HiFi_Net_loc.py (localization files)
     ├── HiFi_Net_loc.sh (localization evaluation)
     ├── HiFi_Net.py (API for the user input image.)
@@ -86,10 +86,6 @@ A1. For each forgery method, we save both train and val in the SAME folder, from
 Q2. What is the dataset naming for STGAN and faceshifter section?
 
 A2. Please check the STGAN.txt in this [link](https://drive.google.com/drive/folders/1OIUv7OGxfAyerMnmKvrNnN_5CmIDcNxo?usp=sharing), which contains all manipulated/modified images we have used for training and validation. This txt file will be loaded by this line of [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L163), which says about the corresponding masks. Lastly, I am not sure if I have release the authentic images, if I do not, you can simply find them in the public celebAHQ dataset. I will try to offer the rigid naming for the dataset in the near future. 
-
-Q3. The training script does not make the loss down.
-
-A3. As indicated in [Updates Section](#update), before October, we only release the code for the reference. Now, we have updated one of training codes we have used as one **example** which however may not have all components proposed and reflect a specific combination of hyper-parameters presented in the paper. If you want to learn more on the training, please take a look at this [screenshot](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/tb_viz.png), which I collect from the previous experiment. This figure demonstrates the loss decreases after the careful choosing a set of hyper-parameters, and it can take much time for map_loss to get converged. 
 
 ### Reference
 If you would like to use our work, please cite:
