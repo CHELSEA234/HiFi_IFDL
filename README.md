@@ -1,6 +1,6 @@
 # HiFi_IFDL
 
-This is the source code for image editing detection and localization. Our work has been accepted by CVPR $2023$, titled as "*Hierarchical Fine-Grained Image Forgery Detection and Localization*". [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
+This is the source code for image editing detection and localization. Our work has been accepted by CVPR $2023$, titled "*Hierarchical Fine-Grained Image Forgery Detection and Localization*." [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
 
 Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en), [Xiaohong Liu](https://jhc.sjtu.edu.cn/~xiaohongliu/), [Iacopo Masi](https://iacopomasi.github.io/), [Xiaoming Liu](http://cvlab.cse.msu.edu/)
 
@@ -9,16 +9,17 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 </p>
 
 ### <a name="update"></a> Updates.
-- The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
-- The DAPRA sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
-- The extended version of our work has been submitted to one of Machine Learning Journals.
-- **this github will keep updated, please stay tuned~**
+- [July 2024] 👏 **ECCV2024** "deepfake-talk" paper [[ArXiv]](https://arxiv.org/pdf/2402.00126) reports HiFi-Net's deepfake detection performance and the source code is released [[link]](https://github.com/CHELSEA234/HiFi_IFDL/edit/main/applications/deepfake_detection).
+- [2023, Sep] The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
+- [2023, Sep] The DAPRA-sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
+- [2023, June] The extended version of our work has been submitted to one of the ~~Machine Learning Journals~~ IJCV.
+- **This GitHub will keep updated, please stay tuned~**
 
 ### Short 5 Min Video 
 [![Please Click the Figure](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/architecture.png)](https://www.youtube.com/watch?v=FwS3X5xcj8A&list=LL&index=5)
 
 ### Usage on Manipulation Localization (_e.g._, Columbia, Coverage, CASIA, NIST16 and IMD2020)
-- To create your own environment by
+- To create your environment by
   ```
   conda env create -f environment.yml
   ```
@@ -54,7 +55,7 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 ```
 
 ### Quick Start of Source Code
-The quick view on the code structure:
+A quick view of the code structure:
 ```bash
 ./HiFi_IFDL
     ├── HiFi_Net_loc.py (localization files)
@@ -62,15 +63,15 @@ The quick view on the code structure:
     ├── HiFi_Net.py (API for the user input image.)
     ├── IMD_dataloader.py (call dataloaders in the utils folder)
     ├── model (model module folder)
-    │      ├── NLCDetection_pconv.py (partial convolution, localization and classification modules)
-    │      ├── seg_hrnet.py (feature extrator based on HRNet)
+    │      ├── NLCDetection_pconv.py (partial convolution, localization, and classification modules)
+    │      ├── seg_hrnet.py (feature extractor based on HRNet)
     │      ├── LaPlacianMs.py (laplacian filter on the feature map)
     │      ├── GaussianSmoothing.py (self-made smoothing functions)
     │      └── ...   
     ├── utils (utils, dataloader, and localization loss class.)
     │      ├── custom_loss.py (localization loss class and the real pixel center initialization)
     │      ├── utils.py
-    │      ├── load_data.py (loading traininga and val dataset.)
+    │      ├── load_data.py (loading training and val dataset.)
     │      └── load_edata.py (loading inference dataset.)
     ├── asset (folder contains sample images with their ground truth and predictions.)
     ├── weights (put the pre-trained weights in.)
@@ -79,11 +80,11 @@ The quick view on the code structure:
 ```
 
 ### Question and Answers.
-Q1. Why train and val dataset are in the same path? 
+Q1. Why train and val datasets are in the same path? 
 
-A1. For each forgery method, we save both train and val in the SAME folder, from which we use a text file to obtain the training and val images. The text file contains list of image names, and first `val_num` are used for training and last "val_num" for validation. Specifically refer to [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L271) for details. What is more, we build up the code on the top of the PSCC-Net, which adapts the same style of loading data, please compare [code1](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L88) with [code2](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L290).
+A1. For each forgery method, we save both train and val in the SAME folder, from which we use a text file to obtain the training and val images. The text file contains a list of image names, and the first `val_num` are used for training and the last "val_num" for validation. Specifically, refer to [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L271) for details. What is more, we build up the code on the top of the PSCC-Net, which adapts the same style of loading data, please compare [code1](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L88) with [code2](https://github.com/proteus1991/PSCC-Net/blob/main/utils/load_tdata.py#L290).
 
-Q2. What is the dataset naming for STGAN and faceshifter section?
+Q2. What is the dataset naming for STGAN and the face-shifter section?
 
 A2. Please check the STGAN.txt in this [link](https://drive.google.com/drive/folders/1OIUv7OGxfAyerMnmKvrNnN_5CmIDcNxo?usp=sharing), which contains all manipulated/modified images we have used for training and validation. This txt file will be loaded by this line of [code](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_data.py#L163), which says about the corresponding masks. Lastly, I am not sure if I have release the authentic images, if I do not, you can simply find them in the public celebAHQ dataset. I will try to offer the rigid naming for the dataset in the near future. 
 
