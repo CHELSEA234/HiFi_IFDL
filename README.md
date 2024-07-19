@@ -1,15 +1,15 @@
 # HiFi_IFDL
 
-This is the source code for image editing detection and localization. Our work has been accepted by CVPR $2023$, titled "*Hierarchical Fine-Grained Image Forgery Detection and Localization*." [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
+This is the source code for our CVPR $2023$: "*Hierarchical Fine-Grained Image Forgery Detection and Localization*." [[Arxiv]](https://arxiv.org/pdf/2303.17111.pdf)
 
-Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en), [Xiaohong Liu](https://jhc.sjtu.edu.cn/~xiaohongliu/), [Iacopo Masi](https://iacopomasi.github.io/), [Xiaoming Liu](http://cvlab.cse.msu.edu/)
+Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en), [Xiaohong Liu](https://jhc.sjtu.edu.cn/~xiaohongliu/), [Zhiyuan Ren](https://scholar.google.com/citations?user=Z1ltuXEAAAAJ&hl=en), [Steven Grosz](https://scholar.google.com/citations?user=I1wOjTYUyYAC&hl=en), [Iacopo Masi](https://iacopomasi.github.io/), [Xiaoming Liu](http://cvlab.cse.msu.edu/)
 
 <p align="center">
   <img src="https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/overview_4.png" alt="drawing" width="1000"/>
 </p>
 
 ### <a name="update"></a> Updates.
-- [July 2024] 👏 **ECCV2024** "deepfake-talk" paper [[ArXiv]](https://arxiv.org/pdf/2402.00126) reports HiFi-Net's deepfake detection performance and the source code is released [[link]](https://github.com/CHELSEA234/HiFi_IFDL/edit/main/applications/deepfake_detection).
+- [July 2024] 👏 **ECCV2024** "Deepfake Explainer" paper [[ArXiv]](https://arxiv.org/pdf/2402.00126) reports HiFi-Net's deep fake detection performance and the source code is released [[link]](https://github.com/CHELSEA234/HiFi_IFDL/edit/main/applications/deepfake_detection).
 - [2023, Sep] The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
 - [2023, Sep] The DAPRA-sponsored image forensic demo can be viewed at this link: [Demo](https://drive.google.com/file/d/1q5ruko3bS4g-fuvq28C6SfzeSUrtLES6/view?usp=sharing)
 - [2023, June] The extended version of our work has been submitted to one of the ~~Machine Learning Journals~~ IJCV.
