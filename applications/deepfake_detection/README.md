@@ -1,6 +1,10 @@
 # HiFi_Deepfake
 
-We apply the HiFi_IFDL for the deepfake detection as the following diagram:
+We apply the HiFi_Net for the deepfake detection as the following diagram:
+
+<p align="center">
+  <img src="https://github.com/CHELSEA234/HiFi_IFDL/blob/main/figures/HiFi_deepfake.png" alt="drawing" width="1000"/>
+</p>
 
 ### Reported Performance
 <center>
@@ -12,6 +16,8 @@ We apply the HiFi_IFDL for the deepfake detection as the following diagram:
 |WildDeepfake|$65.22$|$66.29$|$38.65$|N/A|N/A
   
 </center>
+
+More results please refer to the table $3$ of our ECCV2024 paper [[ArXiv]](https://arxiv.org/pdf/2402.00126)
 
 ### The Pre-trained Weights and User-friendly Preprocessed Dataset:
 1. The pre-trained weights on FF++ can be download via [[link]](https://drive.google.com/drive/folders/1AElYlVxsahgGIua3m3Kj2VhSc3S7ADLJ?usp=sharing)
