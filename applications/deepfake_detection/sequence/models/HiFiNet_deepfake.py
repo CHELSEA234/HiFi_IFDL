@@ -83,13 +83,13 @@ def merge_sum(out1, out2):
 if __name__ == "__main__":
     import torch
     input = torch.randn((4, 1, 3, 224, 224)).cuda()  # [64, 10, 3, 224, 224]
-    model = ViT_rgb_lp(use_laplacian=True, drop_rate=0.2, use_magic_loss=False,
-                        pretrained=True, rnn_drop_rate=0.2, feat_dim=1000,
-                        rnn_hidden_size=128, num_rnn_layers=2,
-                        bidir=True).cuda()
+    model = HiFiNet_deepfake(use_laplacian=True, drop_rate=0.2, use_magic_loss=False,
+                            pretrained=True, rnn_drop_rate=0.2, feat_dim=1000,
+                            rnn_hidden_size=128, num_rnn_layers=2,
+                            bidir=True).cuda()
     model = torch.nn.DataParallel(model)
 
     print(f"...comes to this place...")
-    output = model(input, input)
+    output = model(input)
     print(f"the model output: ", output.size())
     print("...over...")

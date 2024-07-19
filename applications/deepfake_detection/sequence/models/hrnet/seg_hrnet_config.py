@@ -15,7 +15,7 @@ HRNET = CN()
 HRNET.PRETRAINED_LAYERS = ['*']
 HRNET.STEM_INPLANES = 64
 HRNET.FINAL_CONV_KERNEL = 1
-HRNET.PRETRAINED = '/research/cvl-guoxia11/semi_supervise_local/IJCV_deepfake/deepfake_HiFiNet++_v4_pretrained/hrnet_w18_small_model_v2.pth'
+HRNET.PRETRAINED = './sequence/models/hrnet/hrnet_w18_small_model_v2.pth'
 
 HRNET.STAGE1 = CN()
 HRNET.STAGE1.NUM_MODULES = 1
@@ -55,26 +55,6 @@ def get_cfg_defaults():
   # Return a clone so that the defaults will not be altered
   # This is for the "local variable" use pattern
   return HRNET.clone()
-
-# def one_hot_label_new(vector, Softmax_m=nn.Softmax(dim=1)):
-#     '''
-#         compute the probability for being as the synthesized image (TODO: double check).
-#     '''
-#     x = Softmax_m(vector)
-#     indices = torch.argmax(x, dim=1)
-#     prob = 1 - x[:,0]
-#     indices = list(indices.cpu().numpy())
-#     prob = list(prob.cpu().numpy())
-#     return indices, prob
-
-# def level_1_convert(input_lst):
-#     res_lst = []
-#     for _ in input_lst:
-#         if _ == 0:
-#             res_lst.append(0)
-#         else:
-#             res_lst.append(1)
-#     return res_lst
 
 if __name__ == "__main__":
   print("Hello World!")

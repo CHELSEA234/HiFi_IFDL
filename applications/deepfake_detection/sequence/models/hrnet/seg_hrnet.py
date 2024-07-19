@@ -639,6 +639,10 @@ class HighResolutionNet(nn.Module):
             print("no pretrain dict length is: ", len(nopretrained_dict))  ## GX: how many parameters you need to train on your own.
             model_dict.update(pretrained_dict_used)
             self.load_state_dict(model_dict)
+        else:
+            print(f"{pretrained} does NOT exist.")
+            print(f"Please try to load the pre-trained weights of HR-Net.")
+            import sys;sys.exit(0)
 
 def get_seg_model(cfg, **kwargs):
     model = HighResolutionNet(cfg, **kwargs)
