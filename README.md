@@ -9,6 +9,7 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 </p>
 
 ### <a name="update"></a> Updates.
+- [Sep 2024] 👏 The International Journal of Computer Vision (**IJCV**) has accepted the extended version of HiFi-Net, stay tuned~
 - [Aug 2024] The HiFi-Net is integrated into the DeepFake-o-meter v2.0 platform, which is a user-friendly public detection tool designed by the **University at Buffalo**. [[DeepFake-o-meter v2.0]](https://zinc.cse.buffalo.edu/ubmdfl/deep-o-meter/home_login) [[ArXiv]](https://arxiv.org/pdf/2404.13146)
 - [Jul. 2024] 👏 **ECCV2024** "Deepfake Explainer" paper [[ArXiv]](https://arxiv.org/pdf/2402.00126) reports HiFi-Net's deep fake detection performance and the source code is released [[link]](https://github.com/CHELSEA234/HiFi_IFDL/edit/main/applications/deepfake_detection).
 - [Sep 2023] The first version dataset can be acquired via this link: [Dataset Link](https://drive.google.com/drive/folders/1fwBEmW30-e0ECpCNNG3nRU6I9OqJfMAn?usp=sharing)
