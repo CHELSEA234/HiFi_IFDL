@@ -34,7 +34,8 @@ Authors: [Xiao Guo](https://scholar.google.com/citations?user=Gkc-lAEAAAAJ&hl=en
 - More quantitative and qualitative results can be found at: [csv](https://drive.google.com/drive/folders/12iS0ILb6ndXtdWjonByrgnejzuAvwCqp?usp=sharing) and [qualitative results](https://drive.google.com/drive/folders/1iZp6ciOHSbGq4EsC_AYl7zVK24gBtrd1?usp=sharing).
 - If you would like to generate the above result. Download $5$ datasets via [link](https://drive.google.com/file/d/1RYXTg0Q82KEvkeOtaaR5AZ0FBx5219SY/view?usp=sharing) and unzip it by `tar -xvf data.tar.gz`. Then, uncomment this [line](https://github.com/CHELSEA234/HiFi_IFDL/blob/main/utils/load_edata.py#L21) and run `HiFi_Net_loc.sh`. 
 
-### Usage on the detection and localization in the HiFi-IFDL dataset (Tab. 2 and Supplementary Fig.1):
+### Usage on Detecting and Localization for the general forged content including GAN and diffusion-generated images:
+- This reproduces detection and localization results in the HiFi-IFDL dataset (Tab. 2 and Supplementary Fig.1)
 - Go to [HiFi_IFDL_weights_link](https://drive.google.com/drive/folders/1v07aJ2hKmSmboceVwOhPvjebFMJFHyhm?usp=sharing) to download the weights, and then put them in `weights`. 
 - The quick usage on HiFi_Net:
 ```python
